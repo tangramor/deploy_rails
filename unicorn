@@ -1,0 +1,80 @@
+#! /bin/bash
+
+### BEGIN INIT INFO
+# Provides:          unicorn
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the unicorn web server
+# Description:       starts unicorn
+### END INIT INFO
+
+USER="www-data"
+DAEMON=unicorn
+RUBY_VERSION=2.0.0
+RAILS_ENV=production
+RVM_PROFILE="/etc/profile.d/rvm.sh"
+APPPATH="/var/www/MYAPP"
+DAEMON_OPTS="-c $APPPATH/config/unicorn.rb -E $RAILS_ENV -D"
+NAME=unicorn
+DESC="Unicorn app for $USER"
+PID=$APPPATH/tmp/pids/unicorn.pid
+
+CD_TO_APP_DIR="cd $APPPATH"
+
+UPDATE_CMD="$CD_TO_APP_DIR > /dev/null 2>&1 && source $RVM_PROFILE && rvm use $RUBY_VERSION >/dev/null 2>/dev/null && rake db:migrate RAILS_ENV=$RAILS_ENV && rake assets:precompile RAILS_ENV=$RAILS_ENV"
+
+case "$1" in
+  start)
+        START_DAEMON_PROCESS="source $RVM_PROFILE && rvm use $RUBY_VERSION >/dev/null 2>/dev/null && bundle exec $DAEMON $DAEMON_OPTS"
+
+        echo -n "Starting $DESC: "
+        if [ `whoami` = root ]; then
+          su - $USER -l -c "$CD_TO_APP_DIR > /dev/null 2>&1 && $START_DAEMON_PROCESS"
+        else
+          $CD_TO_APP_DIR > /dev/null 2>&1 && $START_DAEMON_PROCESS
+        fi
+        echo "$NAME."
+        ;;
+  stop)
+        echo -n "Stopping $DESC: "
+        kill -QUIT `cat $PID`
+        echo "$NAME."
+        ;;
+  restart)
+        echo -n "Restarting $DESC: "
+        kill -USR2 `cat $PID`
+        echo "$NAME."
+        ;;
+  reload)
+        echo -n "Reloading $DESC configuration: "
+        kill -HUP `cat $PID`
+        echo "$NAME."
+        ;;
+  update)
+        $CD_TO_APP_DIR > /dev/null 2>&1
+        echo -n "Git pull and restart $DESC: "
+        if [ `whoami` = root ]; then
+          su - $USER -l -c "$CD_TO_APP_DIR > /dev/null 2>&1 && git pull"
+        else
+          $CD_TO_APP_DIR > /dev/null 2>&1 && git pull 
+        fi
+        echo -n "Update bundle: "
+        bundle install
+        if [ `whoami` = root ]; then
+          su - $USER -l -c "eval $UPDATE_CMD"
+        else
+          eval $UPDATE_CMD
+        fi
+        kill -USR2 `cat $PID`
+        echo "$NAME."
+        ;;
+  *)
+        echo "Usage: $NAME {start|stop|restart|reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
+
