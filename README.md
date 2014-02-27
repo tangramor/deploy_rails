@@ -13,7 +13,7 @@ If you are using different OS, you may need adjust some configurations in follow
 
 ### 0\. Deploy source code
 
-As root, change user `www-data`'s shell to bash and set its home folder to /var/www
+As root, change user `www-data`'s shell to bash and set its home folder to `/var/www`
 
 #### # vi /etc/passwd
 ```
@@ -62,7 +62,7 @@ config.serve_static_assets = true
 ```
 
 ### 2\. Setup RVM for multi-users
-I use this mode because I want www-data can use rvm directly 
+I use this mode because I want user `www-data` can use rvm directly 
 ```
 $ \curl -L https://get.rvm.io | sudo bash -s stable
 ```
@@ -143,8 +143,8 @@ Edit .gemrc :
 
 First, add following to Gemfile of the application:
 ```
-gem “unicorn”
-gem ‘unicorn-worker-killer’group :development do
+gem 'unicorn'
+gem 'unicorn-worker-killer'
 ```
 
 Then execute following commands:
@@ -339,14 +339,34 @@ DESC="Unicorn app for $USER"
 PID=$APPPATH/tmp/pids/unicorn.pid
 ```
 
-In most cases, you just need to modify `USER`, `RUBY_VERSION`, `RAILS_ENV`, `RVM_PROFILE` and `APPPATH` to the values on your server
+In most cases, you just need to modify `USER`, `RUBY_VERSION`, `RAILS_ENV`, `RVM_PROFILE` and `APPPATH` to the values of your server
 
 ### 3\. Set unicorn auto start when boot up
 ```
 # update-rc.d unicorn defaults
 ```
 
-### 4\. Deploy code changes
+### 4\. Configure SSH connection between workstation and servers
+You need to generate ssh key on your workstation. For example, my work machine is a laptop and I installed Ubuntu 13.10 on it, so I generate ssh key by execute `ssh-keygen` without input passphrase for the key (this will generate a key with no passphrase)
+```
+$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/USERNAME/.ssh/id_rsa):
+......
+```
+Then append the public key string to the servers. In this case we use `www-data` user, so just log in the server, open `/var/www/.ssh/authorized_keys` and add the content of `/home/USERNAME/.ssh/id_rsa.pub` on you workstation to it:
+
+```
+On your workstation------------------------------------------
+$ scp ~/.ssh/id_rsa.pub ServerUser@192.168.1.61:~/id_rsa.pub
+$ ssh ServerUser@192.168.1.61
+
+Now we are on 192.168.1.61-----------------------------------
+$ cat ~/id_rsa.pub | sudo -u www-data sh -c "cat - >>/var/www/.ssh/authorized_keys"
+$ rm ~/id_rsa.pub
+```
+
+### 5\. Deploy code changes
 After you committed any change on you app and pushed to your git server, you can execute [update_unicorn.sh](https://github.com/tangramor/deploy_rails/blob/master/update_unicorn.sh) to deploy the changes to your production servers. You need to edit `update_unicorn.sh` to match your environment
 ```
 SERVER_IPS=(192.168.1.61 192.168.1.62)
@@ -354,7 +374,7 @@ SERVER_USERS=(www-data www-data)
 RUBY_VERSION=2.0.0
 RVM_PROFILE="/etc/profile.d/rvm.sh"
 ```
-
+In this example we have 2 servers: 192.168.1.61 and 192.168.1.62. And on both server we use `www-data` user to execute the rails application.
 
 ### Reference:
 
