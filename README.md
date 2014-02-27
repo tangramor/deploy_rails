@@ -7,9 +7,11 @@ I tried to use Capistrano to do the deployment, but met a lot of problems, such 
 
 ## Prerequirements
 
-You need to follow following steps to deploy you ruby on rails application to a Ubuntu + Nginx + Unicorn environment. Here I installed RVM as multiple users mode. And I use `www-data` user to run my app.
+You may need to follow steps below to deploy you ruby on rails application to a Ubuntu + Nginx + Unicorn environment. Here I installed RVM as multiple users mode. And I use `www-data` user to run my app. 
 
-If you are using different OS, you may need adjust some configurations in following steps accordingly.
+You can also refer to other tutorials to do the initial deployment, such as [Lighting fast, zero-downtime deployments with git, capistrano, nginx and Unicorn](http://ariejan.net/2011/09/14/lighting-fast-zero-downtime-deployments-with-git-capistrano-nginx-and-unicorn/), but it uses Capistrano, so if you follow it completely, you don't need my tool... 
+
+Or you can refer to [How To Deploy Rails Apps Using Unicorn And Nginx on CentOS 6.5](https://www.digitalocean.com/community/articles/how-to-deploy-rails-apps-using-unicorn-and-nginx-on-centos-6-5) if you are using CentOS. But if you are using different OS, you may need adjust some configurations in following steps accordingly.
 
 ### 0\. Deploy source code
 
