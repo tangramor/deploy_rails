@@ -3,17 +3,17 @@ deploy_rails
 
 Use Shell script to update rails applications on remote servers through git, and execute bundle install, rake db:migration, asset precompile and restart unicorn...
 
-I tried to use Capistrano to do the deployment, but met a lot of problems, such as configuration, ruby version, code upgrade...then I decided to write my own script to do the job.
+I tried to use Capistrano to do the deployment, but met a lot of problems, such as configuration error, ruby version not match, code upgrade caused runtime error...then I decided to write my own script to do the job.
 
 ## Prerequirements
 
-You may need to follow steps below to deploy you ruby on rails application to a Ubuntu + Nginx + Unicorn environment. Here I installed RVM as multiple users mode. And I use `www-data` user to run my app. 
+You may need to follow steps below to deploy you ruby on rails application to a Ubuntu + Nginx + Unicorn environment. Here I installed RVM as multiple users mode. And I use `www-data` user to run my app (which is the user for Apache and Nginx on Ubuntu). 
 
 You can also refer to other tutorials to do the initial deployment, such as [Lighting fast, zero-downtime deployments with git, capistrano, nginx and Unicorn](http://ariejan.net/2011/09/14/lighting-fast-zero-downtime-deployments-with-git-capistrano-nginx-and-unicorn/), but it uses Capistrano, so if you follow it completely, you don't need my tool... 
 
 Or you can refer to [How To Deploy Rails Apps Using Unicorn And Nginx on CentOS 6.5](https://www.digitalocean.com/community/articles/how-to-deploy-rails-apps-using-unicorn-and-nginx-on-centos-6-5) if you are using CentOS. But if you are using different OS, you may need adjust some configurations in following steps accordingly.
 
-### 0\. Deploy source code
+### 0\. Deploy source code to "production" servers
 
 As root, change user `www-data`'s shell to bash and set its home folder to `/var/www`
 
@@ -44,6 +44,7 @@ $ git clone https://github.com/MYNAME/MYAPP.git
 ### 1\. Change configuration of the application for "production" environment:
 
 #### config/database.yml
+Here I use MySql, you may change to your database type accordingly
 ```
 production:
 adapter: mysql2
@@ -369,14 +370,15 @@ $ rm ~/id_rsa.pub
 ```
 
 ### 5\. Deploy code changes
-After you committed any change on you app and pushed to your git server, you can execute [update_unicorn.sh](https://github.com/tangramor/deploy_rails/blob/master/update_unicorn.sh) to deploy the changes to your production servers. You need to edit `update_unicorn.sh` to match your environment
+After you committed any change on you app and pushed to your git server, you can execute [update_unicorn.sh](https://github.com/tangramor/deploy_rails/blob/master/update_unicorn.sh) to deploy the changes to your production servers. You need to edit `update_unicorn.sh` to match your environment.
+
 ```
 SERVER_IPS=(192.168.1.61 192.168.1.62)
 SERVER_USERS=(www-data www-data)
 RUBY_VERSION=2.0.0
 RVM_PROFILE="/etc/profile.d/rvm.sh"
 ```
-In this example we have 2 servers: 192.168.1.61 and 192.168.1.62. And on both server we use `www-data` user to execute the rails application.
+In this example we have 2 servers: 192.168.1.61 and 192.168.1.62, they are 2 nodes of a cluster. You can reduce or add servers here. And on both servers we use `www-data` user to execute the rails application.
 
 ### Reference:
 
