@@ -153,7 +153,7 @@ Then execute following commands:
 # bundle install
 ```
 
-### 7\. Configure Unicorn as www-data
+### 7\. Configure Unicorn to be executed by www-data
 
 #### $ vi config/unicorn.rb
 
