@@ -75,6 +75,28 @@ $ \curl -L https://get.rvm.io | sudo bash -s stable
 ```
 $ rvmsudo rvm get head
 $ rvmsudo -s rvm pkg install openssl
+
+$ rvmsudo -s rvm install 2.0.0
+
+```
+
+With `sudo`, open `/etc/bash.bashrc` or `/etc/bashrc` (whichever is available) and add the following to the end of the file. Also run this command in your terminal.
+```
+export PATH=$PATH:/usr/local/rvm/gems/ruby-2.0.0-p247/bin
+export RAILS_ENV=production
+source /etc/profile.d/rvm.sh
+rvm use 2.0.0 >/dev/null 2>/dev/null
+```
+
+Open /var/www/.bashrc and add following:
+```
+source /etc/profile.d/rvm.sh
+rvm use 2.0.0 >/dev/null 2>/dev/null
+```
+
+Then you can modify the gem sources to faster mirror:
+
+```
 $ sudo su -
 
 ###(The following changes only for China mainland, because it is very slow to connect https://rubygems.org/)
@@ -92,23 +114,8 @@ http://ruby.taobao.org
 # sed -i ‘s!ftp.ruby-lang.org/pub/ruby!ruby.taobao.org/mirrors/ruby!’$rvm_path/config/db
 
 # exit
-
-$ rvmsudo -s rvm install 2.0.0
 ```
 
-Open `/etc/bash.bashrc` or `/etc/bashrc` (whichever is available) and add the following to the end of the file. Also run this command in your terminal.
-```
-export PATH=$PATH:/usr/local/rvm/gems/ruby-2.0.0-p247/bin
-export RAILS_ENV=production
-source /etc/profile.d/rvm.sh
-rvm use 2.0.0 >/dev/null 2>/dev/null
-```
-
-Open /var/www/.bashrc and add following:
-```
-source /etc/profile.d/rvm.sh
-rvm use 2.0.0 >/dev/null 2>/dev/null
-```
  
 ### 4\. Setup Unicorn as root
 ```
