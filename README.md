@@ -101,7 +101,7 @@ $ sudo su -
 
 ###(The following changes only for China mainland, because it is very slow to connect https://rubygems.org/)
 
-# gem sources –remove https://rubygems.org/
+# gem sources -r https://rubygems.org/
 
 # gem sources -a http://ruby.taobao.org/
 
@@ -111,7 +111,7 @@ $ sudo su -
 http://ruby.taobao.org
 ### ensure only ruby.taobao.org
 
-# sed -i ‘s!ftp.ruby-lang.org/pub/ruby!ruby.taobao.org/mirrors/ruby!’$rvm_path/config/db
+# sed -i 's!ftp.ruby-lang.org/pub/ruby!ruby.taobao.org/mirrors/ruby!'$rvm_path/config/db
 
 # exit
 ```
@@ -123,7 +123,7 @@ $ sudo su -
 # gem install bundler
 # gem install unicorn
 ```
-or `gem install –verbose –debug unicorn` (with detailed information)
+or `gem install --verbose --debug unicorn` (with detailed information)
 
 if got exception like:
     
